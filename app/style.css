@@ -1,0 +1,146 @@
+/* Vice Frame — dark neon UI. No external fonts or assets: system stack only. */
+:root {
+  --bg: #0b0614;
+  --panel: #150b26;
+  --panel-2: #1d1033;
+  --line: #3a2358;
+  --text: #f4ecff;
+  --muted: #b7a6d9;
+  --pink: #ff2e88;
+  --cyan: #22d3ee;
+  --amber: #ffb347;
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  background:
+    radial-gradient(1100px 500px at 85% -10%, rgba(255, 46, 136, 0.22), transparent 60%),
+    radial-gradient(900px 480px at -10% 0%, rgba(34, 211, 238, 0.16), transparent 55%),
+    var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  min-height: 100vh;
+}
+
+.topbar {
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  padding: 18px 26px 10px; flex-wrap: wrap;
+}
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand-badge {
+  font-family: Impact, "Arial Narrow Bold", "Franklin Gothic Medium", sans-serif;
+  font-size: 26px; letter-spacing: 1px; color: #0b0614;
+  background: linear-gradient(135deg, var(--amber), var(--pink) 55%, var(--cyan));
+  padding: 8px 12px; border-radius: 10px; transform: rotate(-3deg);
+  box-shadow: 0 6px 24px rgba(255, 46, 136, 0.45);
+}
+.brand h1 {
+  margin: 0; font-size: 30px; letter-spacing: 4px;
+  font-family: Impact, "Arial Narrow Bold", "Franklin Gothic Medium", sans-serif;
+  background: linear-gradient(90deg, #fff, var(--amber) 40%, var(--pink) 75%, var(--cyan));
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.brand p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+
+.top-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+button {
+  font: inherit; color: var(--text); background: var(--panel-2);
+  border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s, background 0.15s;
+}
+button:hover { border-color: var(--pink); }
+button:active { transform: scale(0.97); }
+button.ghost { background: rgba(29, 16, 51, 0.7); }
+button.primary {
+  width: 100%; font-weight: 700; font-size: 16px; padding: 13px;
+  background: linear-gradient(90deg, var(--pink), #ff7a3d);
+  border: none; color: #fff; box-shadow: 0 8px 26px rgba(255, 46, 136, 0.4);
+}
+button.primary:hover { filter: brightness(1.1); }
+
+.layout {
+  display: grid; grid-template-columns: 340px 1fr; gap: 20px;
+  padding: 10px 26px 20px; align-items: start;
+}
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+.panel {
+  background: linear-gradient(180deg, var(--panel), rgba(21, 11, 38, 0.85));
+  border: 1px solid var(--line); border-radius: var(--radius); padding: 6px 18px 14px;
+}
+.panel section { padding: 12px 0 14px; border-bottom: 1px dashed rgba(183, 166, 217, 0.18); }
+.panel section:last-child { border-bottom: none; }
+.panel h2 { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: var(--amber); margin: 0 0 10px; }
+.hint { color: var(--muted); font-size: 12px; margin: 8px 0 0; }
+.panel h2 .hint { float: right; letter-spacing: 0; text-transform: none; }
+
+.drop {
+  display: block; border: 2px dashed var(--line); border-radius: var(--radius);
+  padding: 18px 12px; text-align: center; cursor: pointer; background: rgba(34, 211, 238, 0.04);
+}
+.drop:hover, .drop.over { border-color: var(--cyan); background: rgba(34, 211, 238, 0.1); }
+.drop-big { display: block; font-weight: 700; font-size: 16px; }
+.drop-small { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+.thumbs { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.thumbs figure { margin: 0; position: relative; }
+.thumbs img {
+  width: 54px; height: 54px; object-fit: cover; border-radius: 8px;
+  border: 2px solid var(--line); display: block;
+}
+.thumbs button {
+  position: absolute; top: -7px; right: -7px; width: 20px; height: 20px; padding: 0;
+  border-radius: 50%; font-size: 12px; line-height: 1; background: var(--pink); border: none; color: #fff;
+}
+
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { flex: 1 1 auto; font-size: 13px; padding: 7px 9px; white-space: nowrap; }
+.seg button.on {
+  background: linear-gradient(90deg, rgba(255, 46, 136, 0.85), rgba(255, 122, 61, 0.85));
+  border-color: transparent; color: #fff; font-weight: 700;
+}
+
+.ctl { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); margin-top: 9px; }
+.ctl input[type="range"] { flex: 1; accent-color: var(--pink); }
+.check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); margin-top: 9px; cursor: pointer; }
+.check input { accent-color: var(--cyan); width: 16px; height: 16px; }
+.field { display: block; font-size: 13px; color: var(--muted); margin-top: 9px; }
+.field input {
+  display: block; width: 100%; margin-top: 4px; padding: 9px 10px; font-size: 15px;
+  color: var(--text); background: #0e0720; border: 1px solid var(--line); border-radius: 9px;
+}
+.field input:focus { outline: 2px solid var(--cyan); border-color: transparent; }
+
+.stage { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.canvas-wrap {
+  position: relative; width: min(100%, 620px);
+  filter: drop-shadow(0 24px 60px rgba(255, 46, 136, 0.25));
+}
+.canvas-wrap canvas {
+  width: 100%; height: auto; display: block; border-radius: 6px; background: #12081f; cursor: pointer;
+}
+.empty-note {
+  position: absolute; inset: 0; display: flex; flex-direction: column; gap: 6px;
+  align-items: center; justify-content: center; text-align: center; padding: 30px; pointer-events: none;
+}
+.empty-note.hide { display: none; }
+.empty-big {
+  font-family: Impact, "Arial Narrow Bold", sans-serif; font-size: 30px; letter-spacing: 2px; margin: 0;
+  color: #fff; text-shadow: 0 3px 0 var(--pink), 0 6px 22px rgba(0,0,0,0.6);
+}
+.empty-note p { margin: 0; color: var(--muted); max-width: 380px; }
+.stage-hint { color: var(--muted); font-size: 12px; margin: 0; }
+
+.foot { text-align: center; color: var(--muted); font-size: 12px; padding: 4px 20px 22px; }
+
+/* Screenshot mode: ?shot=cover hides the chrome so the poster fills the frame. */
+body.shot-cover .topbar, body.shot-cover .controls, body.shot-cover .foot, body.shot-cover .stage-hint { display: none; }
+body.shot-cover .layout { grid-template-columns: 1fr; padding: 0; }
+body.shot-cover .canvas-wrap { width: 100%; filter: none; }
+body.shot-cover .canvas-wrap canvas { border-radius: 0; }
+body.shot-cover { background: #000; }
