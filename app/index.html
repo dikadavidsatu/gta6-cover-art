@@ -7,97 +7,101 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="topbar">
-  <div class="brand">
-    <span class="brand-badge">VF</span>
-    <div>
+<header class="masthead">
+  <div class="brandmark">
+    <span class="brandmark-chip">VF</span>
+    <div class="brandmark-text">
       <h1>VICE FRAME</h1>
-      <p>Turn your photos into neon-soaked cover art. 100% offline — photos never leave this machine.</p>
+      <p>Your photos, reborn as neon-soaked cover art. Fully offline — nothing ever leaves this machine.</p>
     </div>
   </div>
-  <div class="top-actions">
-    <button id="btn-before" class="ghost" type="button" title="Hold the before / after comparison">Before / After</button>
-    <button id="btn-random" class="ghost" type="button">🎲 Randomize</button>
-    <button id="btn-demo" class="ghost" type="button">Load demo photos</button>
-  </div>
+  <nav class="masthead-actions">
+    <button id="btn-before" class="btn-quiet" type="button" title="Hold to compare against the ungraded photos">Before / After</button>
+    <button id="btn-random" class="btn-quiet" type="button">Shuffle look</button>
+    <button id="btn-demo" class="btn-quiet" type="button">Load demo photos</button>
+  </nav>
 </header>
 
-<main class="layout">
-  <aside class="panel controls">
-    <section>
-      <h2>1 · Photos <span class="hint" id="photo-count">0 / 5</span></h2>
-      <label class="drop" id="drop-zone">
+<main class="workbench">
+  <aside class="rail">
+    <section class="rail-block">
+      <h2>Photos <span class="rail-count" id="photo-count">0 / 5</span></h2>
+      <label class="dropzone" id="drop-zone">
         <input type="file" id="file-input" accept="image/*" multiple hidden>
-        <span class="drop-big">Drop photos here</span>
-        <span class="drop-small">or click to browse — 1 to 5 images, any size</span>
+        <span class="dropzone-title">Drop photos here</span>
+        <span class="dropzone-sub">or click to browse — between 1 and 5 images, any size</span>
       </label>
-      <div class="thumbs" id="thumbs"></div>
+      <div class="thumb-strip" id="thumbs"></div>
     </section>
 
-    <section>
-      <h2>2 · Layout</h2>
-      <div class="seg" id="layout-seg">
+    <section class="rail-block">
+      <h2>Layout</h2>
+      <div class="pillrow" id="layout-seg">
         <button type="button" data-layout="classic" class="on">Classic 5-panel</button>
         <button type="button" data-layout="triptych">Triptych</button>
         <button type="button" data-layout="hero">Hero + strips</button>
         <button type="button" data-layout="duo">Duo split</button>
+        <button type="button" data-layout="mosaic">Mosaic 6</button>
       </div>
-      <p class="hint">Click a panel on the poster to select it, then frame it:</p>
-      <label class="ctl">Panel zoom <input type="range" id="zoom" min="1" max="3" step="0.01" value="1"></label>
-      <label class="ctl">Pan ↔ <input type="range" id="panx" min="-1" max="1" step="0.01" value="0"></label>
-      <label class="ctl">Pan ↕ <input type="range" id="pany" min="-1" max="1" step="0.01" value="0"></label>
-      <p class="hint" id="panel-label">Panel 1 selected</p>
+      <p class="note">Click a panel on the poster to select it, then frame it:</p>
+      <label class="slider-row">Panel zoom <input type="range" id="zoom" min="1" max="3" step="0.01" value="1"></label>
+      <label class="slider-row">Pan sideways <input type="range" id="panx" min="-1" max="1" step="0.01" value="0"></label>
+      <label class="slider-row">Pan up / down <input type="range" id="pany" min="-1" max="1" step="0.01" value="0"></label>
+      <p class="note" id="panel-label">Panel 1 selected</p>
     </section>
 
-    <section>
-      <h2>3 · Vice City grade</h2>
-      <div class="seg" id="preset-seg">
+    <section class="rail-block">
+      <h2>Vice City grade</h2>
+      <div class="pillrow" id="preset-seg">
         <button type="button" data-preset="sunset" class="on">Sunset Blvd</button>
         <button type="button" data-preset="neon">Neon Rain</button>
         <button type="button" data-preset="golden">Golden Hour</button>
+        <button type="button" data-preset="midnight">Midnight Vice</button>
       </div>
-      <label class="ctl">Grade intensity <input type="range" id="grade" min="0" max="1.5" step="0.01" value="1"></label>
-      <label class="ctl">Film grain <input type="range" id="grain" min="0" max="1" step="0.01" value="0.35"></label>
-      <label class="ctl">Vignette <input type="range" id="vignette" min="0" max="1" step="0.01" value="0.55"></label>
-      <label class="check"><input type="checkbox" id="opt-palms" checked> Palm silhouettes</label>
-      <label class="check"><input type="checkbox" id="opt-skyline" checked> Skyline silhouette</label>
-      <label class="check"><input type="checkbox" id="opt-sun" checked> Sunset glow disc</label>
+      <label class="slider-row">Grade intensity <input type="range" id="grade" min="0" max="1.5" step="0.01" value="1"></label>
+      <label class="slider-row">Film grain <input type="range" id="grain" min="0" max="1" step="0.01" value="0.35"></label>
+      <label class="slider-row">Vignette <input type="range" id="vignette" min="0" max="1" step="0.01" value="0.55"></label>
+      <label class="tick"><input type="checkbox" id="opt-palms" checked> Palm silhouettes</label>
+      <label class="tick"><input type="checkbox" id="opt-skyline" checked> Skyline silhouette</label>
+      <label class="tick"><input type="checkbox" id="opt-sun" checked> Sunset glow disc</label>
     </section>
 
-    <section>
-      <h2>4 · Lettering</h2>
-      <label class="field">Title <input type="text" id="title" value="VICE HEAT" maxlength="26"></label>
-      <label class="field">Subtitle <input type="text" id="subtitle" value="WELCOME BACK TO THE CITY OF NEON" maxlength="48"></label>
-      <label class="ctl">Title size <input type="range" id="title-size" min="0.6" max="1.5" step="0.01" value="1"></label>
-      <label class="check"><input type="checkbox" id="opt-badge" checked> Numeral badge</label>
-      <label class="field">Badge text <input type="text" id="badge-text" value="VI" maxlength="4"></label>
+    <section class="rail-block">
+      <h2>Lettering</h2>
+      <label class="text-row">Title <input type="text" id="title" value="VICE HEAT" maxlength="26"></label>
+      <label class="text-row">Subtitle <input type="text" id="subtitle" value="WELCOME BACK TO THE CITY OF NEON" maxlength="48"></label>
+      <label class="text-row">Credit strip <input type="text" id="tagline" value="A VICE FRAME ORIGINAL" maxlength="40"></label>
+      <label class="slider-row">Title size <input type="range" id="title-size" min="0.6" max="1.5" step="0.01" value="1"></label>
+      <label class="tick"><input type="checkbox" id="opt-badge" checked> Numeral badge</label>
+      <label class="text-row">Badge text <input type="text" id="badge-text" value="VI" maxlength="4"></label>
     </section>
 
-    <section>
-      <h2>5 · Export PNG</h2>
-      <div class="seg" id="size-seg">
+    <section class="rail-block">
+      <h2>Export PNG</h2>
+      <div class="pillrow" id="size-seg">
         <button type="button" data-size="1080x1350" class="on">1080 × 1350 post</button>
         <button type="button" data-size="1080x1080">1080 × 1080</button>
         <button type="button" data-size="1920x1080">1920 × 1080</button>
+        <button type="button" data-size="1080x1920">1080 × 1920 story</button>
       </div>
-      <button id="btn-export" class="primary" type="button">⬇ Export cover PNG</button>
-      <p class="hint" id="export-note">Renders at full resolution, straight from your browser.</p>
+      <button id="btn-export" class="btn-export" type="button">Export cover PNG</button>
+      <p class="note" id="export-note">Rendered at full resolution, right here in your browser.</p>
     </section>
   </aside>
 
-  <section class="stage">
-    <div class="canvas-wrap" id="canvas-wrap">
+  <section class="stage-col">
+    <div class="poster-frame" id="poster-frame">
       <canvas id="stage-canvas" width="1080" height="1350"></canvas>
-      <div class="empty-note" id="empty-note">
-        <p class="empty-big">Your cover starts here</p>
-        <p>Add a photo — or hit <b>Load demo photos</b> — and the Vice City grade does the rest.</p>
+      <div class="empty-state" id="empty-note">
+        <p class="empty-title">Your cover starts here</p>
+        <p>Add a photo — or press <b>Load demo photos</b> — and the Vice City grade does the rest.</p>
       </div>
     </div>
-    <p class="stage-hint">Tip: the grade, grain and lettering are drawn live. Export renders the same art at full size.</p>
+    <p class="stage-note">The grade, grain and lettering are drawn live; export re-renders the same art at full size.</p>
   </section>
 </main>
 
-<footer class="foot">Vice Frame · an offline cover-art toy · no uploads, no tracking, no network calls.</footer>
+<footer class="colophon">Vice Frame · an offline cover-art toy · no uploads, no tracking, no network calls.</footer>
 
 <script type="module" src="src/main.js"></script>
 </body>

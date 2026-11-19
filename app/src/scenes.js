@@ -1,28 +1,36 @@
-// Procedural demo "photos": four little painted scenes (beach, boulevard,
-// night drive, portrait) drawn on canvases at runtime. They stand in for a
-// user's own photos in demo mode and screenshots — no image files, no network.
+// Painted demo "photographs".
+//
+// Five little scenes — a beach at sunset, a neon boulevard, a night drive, a
+// portrait, and a marina — drawn procedurally onto canvases when the page
+// loads. They stand in for a visitor's own photos in demo mode and in the
+// screenshots, so the app can show itself off with zero image files and zero
+// network requests.
 import { drawPalm, drawSkyline, mulberry32 } from './render.js';
 
-function canvas(w, h) {
+function makeCanvas(w, h) {
   const c = document.createElement('canvas');
-  c.width = w; c.height = h;
+  c.width = w;
+  c.height = h;
   return c;
 }
 
-function skyGrad(ctx, w, h, stops) {
+function paintSky(ctx, w, h, stops) {
   const g = ctx.createLinearGradient(0, 0, 0, h);
-  for (const [at, col] of stops) g.addColorStop(at, col);
+  for (const [at, colour] of stops) g.addColorStop(at, colour);
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, w, h);
 }
 
-function person(ctx, x, y, s, color = '#12041f') {
-  // Simple standing figure silhouette: head, torso, legs.
+// A standing figure in silhouette. (x, y) is the ground point between the
+// feet; `s` is the figure's height in pixels.
+function figure(ctx, x, y, s, colour = '#12041f') {
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(s, s);
-  ctx.fillStyle = color;
-  ctx.beginPath(); ctx.arc(0, -1.62, 0.16, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = colour;
+  ctx.beginPath();
+  ctx.arc(0, -1.62, 0.16, 0, Math.PI * 2);
+  ctx.fill();
   ctx.beginPath();
   ctx.moveTo(-0.2, -1.44);
   ctx.quadraticCurveTo(0, -1.52, 0.2, -1.44);
@@ -34,82 +42,115 @@ function person(ctx, x, y, s, color = '#12041f') {
   ctx.lineTo(-0.16, 0);
   ctx.lineTo(-0.29, 0);
   ctx.lineTo(-0.24, -0.72);
-  ctx.closePath(); ctx.fill();
+  ctx.closePath();
+  ctx.fill();
   ctx.restore();
 }
 
 export function sceneBeach() {
-  const c = canvas(900, 1100), ctx = c.getContext('2d');
-  const w = c.width, h = c.height;
-  skyGrad(ctx, w, h, [[0, '#2b1055'], [0.35, '#b721ff'], [0.55, '#ff2e88'], [0.72, '#ff7a3d'], [0.85, '#ffd23f']]);
-  // Sun + sea
-  const sunY = h * 0.66;
+  const c = makeCanvas(900, 1100);
+  const ctx = c.getContext('2d');
+  const { width: w, height: h } = c;
+  paintSky(ctx, w, h, [[0, '#2b1055'], [0.35, '#b721ff'], [0.55, '#ff2e88'], [0.72, '#ff7a3d'], [0.85, '#ffd23f']]);
+
+  const horizon = h * 0.66;
   ctx.fillStyle = '#ffe66d';
-  ctx.beginPath(); ctx.arc(w * 0.62, sunY, 92, 0, Math.PI * 2); ctx.fill();
-  const sea = ctx.createLinearGradient(0, sunY, 0, h);
-  sea.addColorStop(0, '#ff9a3d'); sea.addColorStop(0.25, '#c22e7a'); sea.addColorStop(1, '#1b2a6b');
-  ctx.fillStyle = sea; ctx.fillRect(0, sunY, w, h - sunY);
+  ctx.beginPath();
+  ctx.arc(w * 0.62, horizon, 92, 0, Math.PI * 2);
+  ctx.fill();
+
+  const sea = ctx.createLinearGradient(0, horizon, 0, h);
+  sea.addColorStop(0, '#ff9a3d');
+  sea.addColorStop(0.25, '#c22e7a');
+  sea.addColorStop(1, '#1b2a6b');
+  ctx.fillStyle = sea;
+  ctx.fillRect(0, horizon, w, h - horizon);
+
+  // Sun glitter scattered across the water.
   const rnd = mulberry32(41);
-  ctx.fillStyle = 'rgba(255,230,150,0.75)';
+  ctx.fillStyle = 'rgba(255, 230, 150, 0.75)';
   for (let i = 0; i < 46; i++) {
-    const y = sunY + 12 + rnd() * (h - sunY - 30);
-    const spread = 40 + (y - sunY) * 0.55;
-    const x = w * 0.62 + (rnd() - 0.5) * spread * 2;
-    ctx.fillRect(x, y, 14 + rnd() * 46, 3.5);
+    const y = horizon + 12 + rnd() * (h - horizon - 30);
+    const spread = 40 + (y - horizon) * 0.55;
+    ctx.fillRect(w * 0.62 + (rnd() - 0.5) * spread * 2, y, 14 + rnd() * 46, 3.5);
   }
-  // Sand strip + palms + figure
-  ctx.fillStyle = '#160a24'; ctx.fillRect(0, h * 0.93, w, h * 0.07);
+
+  ctx.fillStyle = '#160a24';
+  ctx.fillRect(0, h * 0.93, w, h * 0.07);
   drawPalm(ctx, w * 0.06, h * 0.97, 300, 1, 0.2);
   drawPalm(ctx, w * 0.97, h * 0.96, 240, -1, 0.24);
-  person(ctx, w * 0.34, h * 0.955, 120);
+  figure(ctx, w * 0.34, h * 0.955, 120);
   return c;
 }
 
 export function sceneBoulevard() {
-  const c = canvas(900, 1100), ctx = c.getContext('2d');
-  const w = c.width, h = c.height;
-  skyGrad(ctx, w, h, [[0, '#050914'], [0.5, '#10264f'], [0.8, '#3b1160'], [1, '#12081f']]);
+  const c = makeCanvas(900, 1100);
+  const ctx = c.getContext('2d');
+  const { width: w, height: h } = c;
+  paintSky(ctx, w, h, [[0, '#050914'], [0.5, '#10264f'], [0.8, '#3b1160'], [1, '#12081f']]);
+
   const rnd = mulberry32(7);
   ctx.fillStyle = '#ffffff';
-  for (let i = 0; i < 90; i++) { ctx.globalAlpha = 0.35 + rnd() * 0.6; ctx.fillRect(rnd() * w, rnd() * h * 0.4, 2.4, 2.4); }
+  for (let i = 0; i < 90; i++) {
+    ctx.globalAlpha = 0.35 + rnd() * 0.6;
+    ctx.fillRect(rnd() * w, rnd() * h * 0.4, 2.4, 2.4);
+  }
   ctx.globalAlpha = 1;
+
   drawSkyline(ctx, { x: 0, y: h * 0.34, w, h: h * 0.4 }, 1234, '#ffd23f');
-  // Wet street
-  const st = ctx.createLinearGradient(0, h * 0.74, 0, h);
-  st.addColorStop(0, '#1a1030'); st.addColorStop(1, '#07030f');
-  ctx.fillStyle = st; ctx.fillRect(0, h * 0.74, w, h * 0.26);
-  // Neon signs
-  const signs = [['#ff2e88', 0.12], ['#22d3ee', 0.62], ['#ffb347', 0.8]];
-  for (const [col, fx] of signs) {
+
+  const street = ctx.createLinearGradient(0, h * 0.74, 0, h);
+  street.addColorStop(0, '#1a1030');
+  street.addColorStop(1, '#07030f');
+  ctx.fillStyle = street;
+  ctx.fillRect(0, h * 0.74, w, h * 0.26);
+
+  // Vertical neon signs and their reflections on the wet street.
+  for (const [colour, fx] of [['#ff2e88', 0.12], ['#22d3ee', 0.62], ['#ffb347', 0.8]]) {
     ctx.save();
-    ctx.shadowColor = col; ctx.shadowBlur = 34;
-    ctx.fillStyle = col;
+    ctx.shadowColor = colour;
+    ctx.shadowBlur = 34;
+    ctx.fillStyle = colour;
     ctx.fillRect(w * fx, h * 0.47, 16, 120);
     ctx.restore();
-    ctx.fillStyle = col; ctx.globalAlpha = 0.28;
+    ctx.globalAlpha = 0.28;
+    ctx.fillStyle = colour;
     ctx.fillRect(w * fx - 6, h * 0.74, 28, h * 0.2);
     ctx.globalAlpha = 1;
   }
-  person(ctx, w * 0.44, h * 0.9, 150, '#05030c');
+
+  figure(ctx, w * 0.44, h * 0.9, 150, '#05030c');
   return c;
 }
 
 export function sceneDrive() {
-  const c = canvas(1100, 900), ctx = c.getContext('2d');
-  const w = c.width, h = c.height;
-  skyGrad(ctx, w, h, [[0, '#0b0620'], [0.45, '#47135f'], [0.7, '#c22e7a'], [0.88, '#ff7a3d'], [1, '#2a1206']]);
+  const c = makeCanvas(1100, 900);
+  const ctx = c.getContext('2d');
+  const { width: w, height: h } = c;
+  paintSky(ctx, w, h, [[0, '#0b0620'], [0.45, '#47135f'], [0.7, '#c22e7a'], [0.88, '#ff7a3d'], [1, '#2a1206']]);
   drawSkyline(ctx, { x: 0, y: h * 0.3, w, h: h * 0.34 }, 555, '#ffe9a8');
-  // Road with perspective
+
+  // Road narrowing to a vanishing point.
   ctx.fillStyle = '#0a0714';
   ctx.beginPath();
-  ctx.moveTo(0, h); ctx.lineTo(w * 0.42, h * 0.64); ctx.lineTo(w * 0.58, h * 0.64); ctx.lineTo(w, h);
-  ctx.closePath(); ctx.fill();
-  ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 7; ctx.setLineDash([46, 34]);
-  ctx.beginPath(); ctx.moveTo(w * 0.5, h * 0.66); ctx.lineTo(w * 0.5, h); ctx.stroke();
+  ctx.moveTo(0, h);
+  ctx.lineTo(w * 0.42, h * 0.64);
+  ctx.lineTo(w * 0.58, h * 0.64);
+  ctx.lineTo(w, h);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#ffd23f';
+  ctx.lineWidth = 7;
+  ctx.setLineDash([46, 34]);
+  ctx.beginPath();
+  ctx.moveTo(w * 0.5, h * 0.66);
+  ctx.lineTo(w * 0.5, h);
+  ctx.stroke();
   ctx.setLineDash([]);
-  // Car silhouette, rear three-quarter, low and wide
+
+  // A low, wide car seen from behind: body, glasshouse, light bar, wheels.
   ctx.save();
-  ctx.translate(w * 0.5, h * 0.86); ctx.scale(1, 1);
+  ctx.translate(w * 0.5, h * 0.86);
   ctx.fillStyle = '#07030d';
   ctx.beginPath();
   ctx.moveTo(-330, 30);
@@ -117,56 +158,139 @@ export function sceneDrive() {
   ctx.quadraticCurveTo(-170, -108, -60, -112);
   ctx.quadraticCurveTo(90, -116, 180, -52);
   ctx.quadraticCurveTo(320, -38, 330, 26);
-  ctx.lineTo(300, 44); ctx.lineTo(-300, 44);
-  ctx.closePath(); ctx.fill();
+  ctx.lineTo(300, 44);
+  ctx.lineTo(-300, 44);
+  ctx.closePath();
+  ctx.fill();
   ctx.fillStyle = '#0d1b2e';
   ctx.beginPath();
-  ctx.moveTo(-150, -52); ctx.quadraticCurveTo(-90, -94, 10, -94); ctx.quadraticCurveTo(90, -92, 140, -52);
-  ctx.closePath(); ctx.fill();
-  // Tail-light bar + glow
+  ctx.moveTo(-150, -52);
+  ctx.quadraticCurveTo(-90, -94, 10, -94);
+  ctx.quadraticCurveTo(90, -92, 140, -52);
+  ctx.closePath();
+  ctx.fill();
   ctx.save();
-  ctx.shadowColor = '#ff2255'; ctx.shadowBlur = 42;
+  ctx.shadowColor = '#ff2255';
+  ctx.shadowBlur = 42;
   ctx.fillStyle = '#ff3860';
   ctx.fillRect(-308, -6, 616, 13);
   ctx.restore();
   ctx.fillStyle = '#0a0714';
-  for (const wx of [-225, 225]) { ctx.beginPath(); ctx.arc(wx, 44, 47, 0, Math.PI * 2); ctx.fill(); }
+  for (const wheelX of [-225, 225]) {
+    ctx.beginPath();
+    ctx.arc(wheelX, 44, 47, 0, Math.PI * 2);
+    ctx.fill();
+  }
   ctx.restore();
+
   drawPalm(ctx, w * 0.03, h * 0.68, 190, 1, 0.2);
   drawPalm(ctx, w * 0.98, h * 0.68, 170, -1, 0.24);
   return c;
 }
 
 export function scenePortrait() {
-  const c = canvas(900, 1100), ctx = c.getContext('2d');
-  const w = c.width, h = c.height;
-  skyGrad(ctx, w, h, [[0, '#12082b'], [0.55, '#5b1b6e'], [1, '#ff5e62']]);
-  // Halo sun behind the head
+  const c = makeCanvas(900, 1100);
+  const ctx = c.getContext('2d');
+  const { width: w, height: h } = c;
+  paintSky(ctx, w, h, [[0, '#12082b'], [0.55, '#5b1b6e'], [1, '#ff5e62']]);
+
   const halo = ctx.createRadialGradient(w / 2, h * 0.4, 10, w / 2, h * 0.4, 330);
-  halo.addColorStop(0, 'rgba(255,210,63,0.95)');
-  halo.addColorStop(0.55, 'rgba(255,122,61,0.55)');
-  halo.addColorStop(1, 'rgba(255,46,136,0)');
-  ctx.fillStyle = halo; ctx.fillRect(0, 0, w, h);
-  // Shoulders + head silhouette
+  halo.addColorStop(0, 'rgba(255, 210, 63, 0.95)');
+  halo.addColorStop(0.55, 'rgba(255, 122, 61, 0.55)');
+  halo.addColorStop(1, 'rgba(255, 46, 136, 0)');
+  ctx.fillStyle = halo;
+  ctx.fillRect(0, 0, w, h);
+
   ctx.fillStyle = '#0a0214';
-  ctx.beginPath(); ctx.arc(w / 2, h * 0.42, 128, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath();
+  ctx.arc(w / 2, h * 0.42, 128, 0, Math.PI * 2);
+  ctx.fill();
   ctx.beginPath();
   ctx.moveTo(w * 0.14, h);
   ctx.quadraticCurveTo(w * 0.16, h * 0.66, w * 0.38, h * 0.6);
   ctx.lineTo(w * 0.62, h * 0.6);
   ctx.quadraticCurveTo(w * 0.84, h * 0.66, w * 0.86, h);
-  ctx.closePath(); ctx.fill();
-  // Sunglasses glint
+  ctx.closePath();
+  ctx.fill();
+
+  // The glint of neon in a pair of sunglasses.
+  ctx.save();
+  ctx.shadowColor = '#22d3ee';
+  ctx.shadowBlur = 18;
   ctx.fillStyle = '#22d3ee';
-  ctx.save(); ctx.shadowColor = '#22d3ee'; ctx.shadowBlur = 18;
   ctx.fillRect(w / 2 - 96, h * 0.4, 76, 20);
   ctx.fillRect(w / 2 + 20, h * 0.4, 76, 20);
   ctx.restore();
-  drawPalm(ctx, w * 0.02, h * 1.0, 260, 1, 0.14);
-  drawPalm(ctx, w * 1.0, h * 1.0, 300, -1, 0.18);
+
+  drawPalm(ctx, w * 0.02, h, 260, 1, 0.14);
+  drawPalm(ctx, w, h, 300, -1, 0.18);
   return c;
 }
 
+export function sceneMarina() {
+  const c = makeCanvas(1100, 900);
+  const ctx = c.getContext('2d');
+  const { width: w, height: h } = c;
+  paintSky(ctx, w, h, [[0, '#0b1035'], [0.4, '#3730a3'], [0.62, '#c22e7a'], [0.8, '#ff7a3d'], [1, '#ffd23f']]);
+
+  const waterline = h * 0.58;
+  const water = ctx.createLinearGradient(0, waterline, 0, h);
+  water.addColorStop(0, '#e0641e');
+  water.addColorStop(0.3, '#7a2d6e');
+  water.addColorStop(1, '#0b1e4b');
+  ctx.fillStyle = water;
+  ctx.fillRect(0, waterline, w, h - waterline);
+
+  // Broken reflections dancing on the harbour.
+  const rnd = mulberry32(2026);
+  for (let i = 0; i < 60; i++) {
+    const y = waterline + 10 + rnd() * (h - waterline - 24);
+    ctx.fillStyle = rnd() > 0.5 ? 'rgba(255, 190, 90, 0.6)' : 'rgba(120, 220, 255, 0.45)';
+    ctx.fillRect(rnd() * w, y, 18 + rnd() * 60, 3);
+  }
+
+  // Two yachts at anchor: hull, cabin, mast and a string of deck lights.
+  const yacht = (cx, cy, s, flip) => {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(flip * s, s);
+    ctx.fillStyle = '#0a0618';
+    ctx.beginPath();
+    ctx.moveTo(-150, 0);
+    ctx.lineTo(150, 0);
+    ctx.lineTo(112, 34);
+    ctx.lineTo(-118, 34);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillRect(-62, -26, 118, 26);
+    ctx.fillRect(-8, -118, 5, 118);
+    ctx.beginPath();
+    ctx.moveTo(-3, -112);
+    ctx.lineTo(-3, -14);
+    ctx.lineTo(-74, -14);
+    ctx.closePath();
+    ctx.fill();
+    ctx.save();
+    ctx.shadowColor = '#ffd23f';
+    ctx.shadowBlur = 12;
+    ctx.fillStyle = '#ffe9a8';
+    for (let i = 0; i < 6; i++) ctx.fillRect(-120 + i * 44, 8, 12, 7);
+    ctx.restore();
+    ctx.restore();
+  };
+  yacht(w * 0.3, waterline + 26, 1, 1);
+  yacht(w * 0.76, waterline + 52, 0.72, -1);
+
+  // Boardwalk strip with a lone walker.
+  ctx.fillStyle = '#12081f';
+  ctx.fillRect(0, h * 0.9, w, h * 0.1);
+  figure(ctx, w * 0.55, h * 0.985, 105, '#05030c');
+  drawPalm(ctx, w * 0.04, h * 0.92, 170, 1, 0.2);
+  drawPalm(ctx, w * 0.97, h * 0.92, 150, -1, 0.22);
+  return c;
+}
+
+// The demo set, in poster order.
 export function demoScenes() {
-  return [sceneBeach(), sceneBoulevard(), sceneDrive(), scenePortrait()];
+  return [sceneBeach(), sceneBoulevard(), sceneDrive(), scenePortrait(), sceneMarina()];
 }
