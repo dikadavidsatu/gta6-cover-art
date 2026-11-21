@@ -143,11 +143,11 @@ function verifyAndManifest() {
     return { path: rel, bytes: statSync(abs).size, sha256: sha256File(abs) };
   });
   const totalBytes = files.reduce((sum, f) => sum + f.bytes, 0);
+  // The manifest deliberately contains no timestamps or paths, so repeated
+  // runs of this handoff are byte-identical.
   const manifest = {
     tool: 'vice-frame-handoff',
     version: 2,
-    generatedAt: new Date().toISOString(),
-    outputDir: outDir,
     fileCount: files.length,
     totalBytes,
     dossierBytes: statSync(dossierPath).size,
