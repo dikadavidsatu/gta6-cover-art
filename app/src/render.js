@@ -1,8 +1,9 @@
 // Vice Frame rendering engine.
 //
-// Everything the poster is made of lives here: the panel layouts, the four
-// grade presets, the photo grade itself, the silhouette overlays (sun disc,
-// skyline, palms), film grain, vignette, and the cover lettering. All of it is
+// Everything the poster is made of lives here: the panel layouts (now six,
+// including the equal-weight Grid), the four grade presets, the photo grade
+// itself, the silhouette overlays (sun disc, skyline, palms), film grain,
+// vignette, an analogue light-leak pass, and the cover lettering. All of it is
 // a pure function of (context, width, height, state, photos), so the on-screen
 // preview and the full-resolution PNG export draw through the very same path.
 
@@ -76,6 +77,15 @@ export const LAYOUTS = {
     { x: 0.73, y: 0.27, w: 0.27, h: 0.29 },
     { x: 0.0, y: 0.44, w: 0.34, h: 0.56 },
     { x: 0.34, y: 0.44, w: 0.66, h: 0.56 },
+  ],
+  // Grid: a clean 2×2 quadrant layout. Every photo gets equal weight, which
+  // suits sets of four portraits or four detail shots where no single image
+  // should dominate the cover.
+  grid: [
+    { x: 0.0, y: 0.0, w: 0.5, h: 0.5 },
+    { x: 0.5, y: 0.0, w: 0.5, h: 0.5 },
+    { x: 0.0, y: 0.5, w: 0.5, h: 0.5 },
+    { x: 0.5, y: 0.5, w: 0.5, h: 0.5 },
   ],
 };
 
@@ -245,6 +255,46 @@ function paintPanel(ctx, img, rect, frame, preset, gradeAmt, raw) {
     ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = 1;
   }
+  ctx.restore();
+}
+
+// ---------------------------------------------------------- light leak --
+
+// An analogue light leak: two soft, warm radial blooms bleeding in from the
+// top corners, composited with 'screen' so they only ever lift the image —
+// the happy accident you get from a cracked film-camera back. The hue follows
+// the active preset, the left bloom runs hotter than the right, and the whole
+// pass is scaled by `amount` (state.lightLeak, 0–1; 0 disables it entirely).
+// It is drawn after the vignette so the corners glow *through* the darkening
+// instead of being swallowed by it.
+export function paintLightLeak(ctx, W, H, preset, amount) {
+  if (!(amount > 0)) return;
+  const strength = Math.min(1, amount);
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+
+  const blooms = [
+    { x: W * 0.04, y: -H * 0.06, r: Math.max(W, H) * 0.62, alpha: 0.5 },
+    { x: W * 1.02, y: H * 0.08, r: Math.max(W, H) * 0.48, alpha: 0.34 },
+  ];
+  for (const bloom of blooms) {
+    const g = ctx.createRadialGradient(bloom.x, bloom.y, 0, bloom.x, bloom.y, bloom.r);
+    g.addColorStop(0, rgba(preset.glowCore, bloom.alpha * strength));
+    g.addColorStop(0.45, rgba(preset.glowCore, bloom.alpha * 0.45 * strength));
+    g.addColorStop(1, rgba(preset.glowCore, 0));
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // A thin diagonal flare streak ties the two blooms together, like light
+  // raking across the lens at a low sun angle.
+  const streak = ctx.createLinearGradient(0, 0, W, H * 0.55);
+  streak.addColorStop(0, rgba(preset.glowCore, 0));
+  streak.addColorStop(0.5, rgba(preset.glowCore, 0.14 * strength));
+  streak.addColorStop(1, rgba(preset.glowCore, 0));
+  ctx.fillStyle = streak;
+  ctx.fillRect(0, 0, W, H);
+
   ctx.restore();
 }
 
@@ -461,6 +511,12 @@ export function renderCover(ctx, W, H, state, photos, raw = false) {
       ctx.fillRect(0, 0, W, H);
       ctx.restore();
     }
+
+    // Light leak runs last among the photographic passes (before the border
+    // and lettering) so the blooms sit on top of grain and vignette alike.
+    // Older saved states may not carry the field yet — default to a gentle
+    // leak rather than none, matching the workbench's initial slider value.
+    paintLightLeak(ctx, W, H, preset, state.lightLeak ?? 0.45);
 
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
     ctx.lineWidth = Math.max(2, W * 0.0022);

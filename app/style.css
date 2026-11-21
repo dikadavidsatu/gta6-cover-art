@@ -60,6 +60,15 @@ button {
 }
 button:hover { border-color: var(--hot); }
 button:active { transform: scale(0.97); }
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--aqua);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  button { transition: none; }
+  button:active { transform: none; }
+}
 .btn-quiet { background: rgba(30, 17, 54, 0.72); }
 .btn-quiet.on { border-color: var(--aqua); color: var(--aqua); }
 .btn-export {
@@ -100,6 +109,13 @@ button:active { transform: scale(0.97); }
   padding: 18px 12px; background: rgba(34, 211, 238, 0.04);
 }
 .dropzone:hover, .dropzone.over { border-color: var(--aqua); background: rgba(34, 211, 238, 0.1); }
+.dropzone:focus-within {
+  border-color: var(--sun);
+  background: rgba(255, 179, 71, 0.08);
+  outline: 2px solid rgba(255, 179, 71, 0.45);
+  outline-offset: 2px;
+}
+::selection { background: rgba(255, 46, 136, 0.55); color: #ffffff; }
 .dropzone-title { display: block; font-size: 16px; font-weight: 700; }
 .dropzone-sub { display: block; margin-top: 4px; color: var(--faded); font-size: 12px; }
 
@@ -122,6 +138,7 @@ button:active { transform: scale(0.97); }
 .pillrow button.on {
   border-color: transparent; color: #ffffff; font-weight: 700;
   background: linear-gradient(90deg, rgba(255, 46, 136, 0.88), rgba(255, 122, 61, 0.88));
+  box-shadow: 0 4px 16px rgba(255, 46, 136, 0.35);
 }
 
 .slider-row {
@@ -129,6 +146,10 @@ button:active { transform: scale(0.97); }
   margin-top: 9px; color: var(--faded); font-size: 13px;
 }
 .slider-row input[type="range"] { flex: 1; accent-color: var(--hot); }
+/* The light-leak slider gets the warm sun accent so the finish controls
+   (grain = pink, vignette = pink, leak = amber) read as a small family. */
+.slider-row input#light-leak { accent-color: var(--sun); }
+.slider-row input[type="range"]:hover { filter: brightness(1.25); }
 
 .tick {
   display: flex; align-items: center; gap: 8px;
@@ -150,6 +171,11 @@ button:active { transform: scale(0.97); }
 .poster-frame {
   position: relative; width: min(100%, 624px);
   filter: drop-shadow(0 24px 60px rgba(255, 46, 136, 0.25));
+  transition: filter 0.25s ease;
+}
+.poster-frame:hover, .poster-frame:focus-within {
+  filter: drop-shadow(0 24px 72px rgba(255, 46, 136, 0.42))
+          drop-shadow(0 0 22px rgba(34, 211, 238, 0.18));
 }
 .poster-frame canvas {
   display: block; width: 100%; height: auto;

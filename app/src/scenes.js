@@ -1,10 +1,11 @@
 // Painted demo "photographs".
 //
-// Five little scenes — a beach at sunset, a neon boulevard, a night drive, a
-// portrait, and a marina — drawn procedurally onto canvases when the page
-// loads. They stand in for a visitor's own photos in demo mode and in the
-// screenshots, so the app can show itself off with zero image files and zero
-// network requests.
+// Six little scenes — a beach at sunset, a neon boulevard, a night drive, a
+// portrait, a marina, and a rooftop pool at dusk — drawn procedurally onto
+// canvases when the page loads. They stand in for a visitor's own photos in
+// demo mode and in the screenshots, so the app can show itself off with zero
+// image files and zero network requests. Six scenes also fill every panel of
+// the six-panel Mosaic and Grid layouts with a distinct image.
 import { drawPalm, drawSkyline, mulberry32 } from './render.js';
 
 function makeCanvas(w, h) {
@@ -290,7 +291,80 @@ export function sceneMarina() {
   return c;
 }
 
+export function sceneRooftop() {
+  const c = makeCanvas(900, 1100);
+  const ctx = c.getContext('2d');
+  const { width: w, height: h } = c;
+  paintSky(ctx, w, h, [[0, '#070b2e'], [0.38, '#312e81'], [0.62, '#9d2c6e'], [0.82, '#ff7a3d'], [1, '#ffb347']]);
+
+  // Distant skyline behind the rooftop parapet.
+  drawSkyline(ctx, { x: 0, y: h * 0.3, w, h: h * 0.32 }, 909, '#ffe9a8');
+
+  // Rooftop deck and parapet wall.
+  ctx.fillStyle = '#170b28';
+  ctx.fillRect(0, h * 0.62, w, h * 0.38);
+  ctx.fillStyle = '#24123d';
+  ctx.fillRect(0, h * 0.62, w, h * 0.035);
+
+  // The pool: a glowing turquoise inset with a bright coping edge and
+  // slow caustic ripples scattered by the seeded PRNG.
+  const pool = { x: w * 0.14, y: h * 0.7, w: w * 0.72, h: h * 0.2 };
+  const waterGlow = ctx.createLinearGradient(0, pool.y, 0, pool.y + pool.h);
+  waterGlow.addColorStop(0, '#67e8f9');
+  waterGlow.addColorStop(0.5, '#22d3ee');
+  waterGlow.addColorStop(1, '#0e7490');
+  ctx.save();
+  ctx.shadowColor = '#22d3ee';
+  ctx.shadowBlur = 36;
+  ctx.fillStyle = waterGlow;
+  ctx.fillRect(pool.x, pool.y, pool.w, pool.h);
+  ctx.restore();
+  ctx.strokeStyle = '#f5eeff';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(pool.x, pool.y, pool.w, pool.h);
+  const rnd = mulberry32(314);
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
+  ctx.lineWidth = 3;
+  for (let i = 0; i < 22; i++) {
+    const y = pool.y + 12 + rnd() * (pool.h - 24);
+    const x = pool.x + 14 + rnd() * (pool.w - 110);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.quadraticCurveTo(x + 28, y - 6 + rnd() * 12, x + 56 + rnd() * 30, y);
+    ctx.stroke();
+  }
+
+  // String lights sagging between two poles over the deck.
+  for (const poleX of [w * 0.08, w * 0.92]) {
+    ctx.fillStyle = '#0a0514';
+    ctx.fillRect(poleX - 4, h * 0.56, 8, h * 0.14);
+  }
+  ctx.strokeStyle = 'rgba(10, 5, 20, 0.9)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(w * 0.08, h * 0.56);
+  ctx.quadraticCurveTo(w * 0.5, h * 0.68, w * 0.92, h * 0.56);
+  ctx.stroke();
+  ctx.save();
+  ctx.shadowColor = '#ffd23f';
+  ctx.shadowBlur = 16;
+  ctx.fillStyle = '#ffe9a8';
+  for (let i = 0; i <= 10; i++) {
+    const t = i / 10;
+    const x = (1 - t) * (1 - t) * w * 0.08 + 2 * (1 - t) * t * w * 0.5 + t * t * w * 0.92;
+    const y = (1 - t) * (1 - t) * h * 0.56 + 2 * (1 - t) * t * h * 0.68 + t * t * h * 0.56;
+    ctx.beginPath();
+    ctx.arc(x, y + 7, 5.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+
+  figure(ctx, w * 0.82, h * 0.985, 118, '#05030c');
+  drawPalm(ctx, w * 0.03, h * 0.99, 210, 1, 0.18);
+  return c;
+}
+
 // The demo set, in poster order.
 export function demoScenes() {
-  return [sceneBeach(), sceneBoulevard(), sceneDrive(), scenePortrait(), sceneMarina()];
+  return [sceneBeach(), sceneBoulevard(), sceneDrive(), scenePortrait(), sceneMarina(), sceneRooftop()];
 }

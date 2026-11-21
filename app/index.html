@@ -15,52 +15,55 @@
       <p>Your photos, reborn as neon-soaked cover art. Fully offline — nothing ever leaves this machine.</p>
     </div>
   </div>
-  <nav class="masthead-actions">
-    <button id="btn-before" class="btn-quiet" type="button" title="Hold to compare against the ungraded photos">Before / After</button>
-    <button id="btn-random" class="btn-quiet" type="button">Shuffle look</button>
-    <button id="btn-demo" class="btn-quiet" type="button">Load demo photos</button>
+  <nav class="masthead-actions" aria-label="Quick actions">
+    <button id="btn-before" class="btn-quiet" type="button" aria-label="Hold to compare against the ungraded photos" title="Hold to compare against the ungraded photos">Before / After</button>
+    <button id="btn-random" class="btn-quiet" type="button" aria-label="Shuffle layout, preset and captions (shortcut: S)">Shuffle look</button>
+    <button id="btn-demo" class="btn-quiet" type="button" aria-label="Load the six painted demo photos (shortcut: D)">Load demo photos</button>
   </nav>
 </header>
 
 <main class="workbench">
   <aside class="rail">
     <section class="rail-block">
-      <h2>Photos <span class="rail-count" id="photo-count">0 / 5</span></h2>
+      <h2>Photos <span class="rail-count" id="photo-count">0 / 6</span></h2>
       <label class="dropzone" id="drop-zone">
-        <input type="file" id="file-input" accept="image/*" multiple hidden>
+        <input type="file" id="file-input" accept="image/*" multiple hidden aria-label="Choose photos to add to your cover">
         <span class="dropzone-title">Drop photos here</span>
-        <span class="dropzone-sub">or click to browse — between 1 and 5 images, any size</span>
+        <span class="dropzone-sub">or click to browse — between 1 and 6 images, any size</span>
       </label>
       <div class="thumb-strip" id="thumbs"></div>
     </section>
 
     <section class="rail-block">
       <h2>Layout</h2>
-      <div class="pillrow" id="layout-seg">
+      <div class="pillrow" id="layout-seg" role="group" aria-label="Cover layout">
         <button type="button" data-layout="classic" class="on">Classic 5-panel</button>
         <button type="button" data-layout="triptych">Triptych</button>
         <button type="button" data-layout="hero">Hero + strips</button>
         <button type="button" data-layout="duo">Duo split</button>
         <button type="button" data-layout="mosaic">Mosaic 6</button>
+        <button type="button" data-layout="grid">Grid 2×2</button>
       </div>
-      <p class="note">Click a panel on the poster to select it, then frame it:</p>
-      <label class="slider-row">Panel zoom <input type="range" id="zoom" min="1" max="3" step="0.01" value="1"></label>
-      <label class="slider-row">Pan sideways <input type="range" id="panx" min="-1" max="1" step="0.01" value="0"></label>
-      <label class="slider-row">Pan up / down <input type="range" id="pany" min="-1" max="1" step="0.01" value="0"></label>
+      <p class="note">Click a panel on the poster to select it, then frame it — or press 1–6 and use the arrow keys:</p>
+      <label class="slider-row">Panel zoom <input type="range" id="zoom" min="1" max="3" step="0.01" value="1" aria-label="Zoom for the selected panel"></label>
+      <label class="slider-row">Pan sideways <input type="range" id="panx" min="-1" max="1" step="0.01" value="0" aria-label="Pan the selected panel sideways"></label>
+      <label class="slider-row">Pan up / down <input type="range" id="pany" min="-1" max="1" step="0.01" value="0" aria-label="Pan the selected panel up or down"></label>
       <p class="note" id="panel-label">Panel 1 selected</p>
     </section>
 
     <section class="rail-block">
       <h2>Vice City grade</h2>
-      <div class="pillrow" id="preset-seg">
+      <div class="pillrow" id="preset-seg" role="group" aria-label="Colour grade preset">
         <button type="button" data-preset="sunset" class="on">Sunset Blvd</button>
         <button type="button" data-preset="neon">Neon Rain</button>
         <button type="button" data-preset="golden">Golden Hour</button>
         <button type="button" data-preset="midnight">Midnight Vice</button>
       </div>
-      <label class="slider-row">Grade intensity <input type="range" id="grade" min="0" max="1.5" step="0.01" value="1"></label>
-      <label class="slider-row">Film grain <input type="range" id="grain" min="0" max="1" step="0.01" value="0.35"></label>
-      <label class="slider-row">Vignette <input type="range" id="vignette" min="0" max="1" step="0.01" value="0.55"></label>
+      <label class="slider-row">Grade intensity <input type="range" id="grade" min="0" max="1.5" step="0.01" value="1" aria-label="Colour grade intensity"></label>
+      <label class="slider-row">Film grain <input type="range" id="grain" min="0" max="1" step="0.01" value="0.35" aria-label="Film grain amount"></label>
+      <label class="slider-row">Vignette <input type="range" id="vignette" min="0" max="1" step="0.01" value="0.55" aria-label="Vignette amount"></label>
+      <label class="slider-row">Light leak <input type="range" id="light-leak" min="0" max="1" step="0.01" value="0.45" aria-label="Analogue light leak amount"></label>
+      <p class="note">Light leak blooms warm light in from the top corners, like a cracked film-camera back. Set it to 0 for a clean digital finish.</p>
       <label class="tick"><input type="checkbox" id="opt-palms" checked> Palm silhouettes</label>
       <label class="tick"><input type="checkbox" id="opt-skyline" checked> Skyline silhouette</label>
       <label class="tick"><input type="checkbox" id="opt-sun" checked> Sunset glow disc</label>
@@ -68,24 +71,25 @@
 
     <section class="rail-block">
       <h2>Lettering</h2>
-      <label class="text-row">Title <input type="text" id="title" value="VICE HEAT" maxlength="26"></label>
-      <label class="text-row">Subtitle <input type="text" id="subtitle" value="WELCOME BACK TO THE CITY OF NEON" maxlength="48"></label>
-      <label class="text-row">Credit strip <input type="text" id="tagline" value="A VICE FRAME ORIGINAL" maxlength="40"></label>
-      <label class="slider-row">Title size <input type="range" id="title-size" min="0.6" max="1.5" step="0.01" value="1"></label>
-      <label class="tick"><input type="checkbox" id="opt-badge" checked> Numeral badge</label>
-      <label class="text-row">Badge text <input type="text" id="badge-text" value="VI" maxlength="4"></label>
+      <label class="text-row">Title <input type="text" id="title" value="VICE HEAT" maxlength="26" aria-label="Cover title"></label>
+      <label class="text-row">Subtitle <input type="text" id="subtitle" value="WELCOME BACK TO THE CITY OF NEON" maxlength="48" aria-label="Cover subtitle"></label>
+      <label class="text-row">Credit strip <input type="text" id="tagline" value="A VICE FRAME ORIGINAL" maxlength="40" aria-label="Bottom credit strip text"></label>
+      <label class="slider-row">Title size <input type="range" id="title-size" min="0.6" max="1.5" step="0.01" value="1" aria-label="Title size"></label>
+      <label class="tick"><input type="checkbox" id="opt-badge" checked aria-label="Show the numeral badge"> Numeral badge</label>
+      <label class="text-row">Badge text <input type="text" id="badge-text" value="VI" maxlength="4" aria-label="Badge text"></label>
     </section>
 
     <section class="rail-block">
       <h2>Export PNG</h2>
-      <div class="pillrow" id="size-seg">
+      <div class="pillrow" id="size-seg" role="group" aria-label="Export size">
         <button type="button" data-size="1080x1350" class="on">1080 × 1350 post</button>
         <button type="button" data-size="1080x1080">1080 × 1080</button>
         <button type="button" data-size="1920x1080">1920 × 1080</button>
         <button type="button" data-size="1080x1920">1080 × 1920 story</button>
+        <button type="button" data-size="1440x1800">1440 × 1800 large post</button>
       </div>
-      <button id="btn-export" class="btn-export" type="button">Export cover PNG</button>
-      <p class="note" id="export-note">Rendered at full resolution, right here in your browser.</p>
+      <button id="btn-export" class="btn-export" type="button" aria-label="Export the cover as a PNG (shortcut: Control or Command plus E)">Export cover PNG</button>
+      <p class="note" id="export-note">Rendered at full resolution, right here in your browser. Shortcuts: Ctrl/Cmd+E export · S shuffle · D demo · 1–6 select panel.</p>
     </section>
   </aside>
 

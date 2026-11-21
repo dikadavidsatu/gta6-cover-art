@@ -11,8 +11,8 @@ const byId = (id) => document.getElementById(id);
 const canvas = byId('stage-canvas');
 const ctx = canvas.getContext('2d');
 
-const SIZES = ['1080x1350', '1080x1080', '1920x1080', '1080x1920'];
-const MAX_PHOTOS = 5;
+const SIZES = ['1080x1350', '1080x1080', '1920x1080', '1080x1920', '1440x1800'];
+const MAX_PHOTOS = 6;
 
 const state = {
   layout: 'classic',
@@ -20,6 +20,7 @@ const state = {
   grade: 1,
   grain: 0.35,
   vignette: 0.55,
+  lightLeak: 0.45,
   palms: true,
   skyline: true,
   sun: true,
@@ -151,6 +152,7 @@ function wireRange(id, apply) {
 wireRange('grade', (v) => { state.grade = v; });
 wireRange('grain', (v) => { state.grain = v; });
 wireRange('vignette', (v) => { state.vignette = v; });
+wireRange('light-leak', (v) => { state.lightLeak = v; });
 wireRange('title-size', (v) => { state.titleSize = v; });
 
 function wireToggle(id, apply) {
@@ -230,8 +232,10 @@ byId('btn-random').addEventListener('click', () => {
   byId('subtitle').value = subtitle;
   state.grain = 0.15 + Math.random() * 0.5;
   state.vignette = 0.3 + Math.random() * 0.5;
+  state.lightLeak = Math.random() * 0.8;
   byId('grain').value = state.grain;
   byId('vignette').value = state.vignette;
+  byId('light-leak').value = state.lightLeak;
   markPill('layout-seg', 'layout', state.layout);
   markPill('preset-seg', 'preset', state.preset);
   ensureFrames();
@@ -241,9 +245,46 @@ byId('btn-random').addEventListener('click', () => {
 
 byId('btn-demo').addEventListener('click', loadDemoPhotos);
 
+// ------------------------------------------------------- keyboard access --
+// Shortcuts for the actions people repeat while art-directing a cover:
+//   Ctrl/Cmd+E  export the PNG        S  shuffle the look
+//   D           load the demo set     1–6  jump straight to a panel
+//   ← / →       move the panel selection without reaching for the mouse
+// They stay out of the way while typing in a text field or slider, so the
+// lettering inputs keep their normal behaviour.
+window.addEventListener('keydown', (event) => {
+  const tag = (event.target.tagName || '').toLowerCase();
+  const typing = tag === 'input' || tag === 'textarea' || event.target.isContentEditable;
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'e') {
+    event.preventDefault();
+    exportCover();
+    return;
+  }
+  if (typing || event.ctrlKey || event.metaKey || event.altKey) return;
+  const key = event.key.toLowerCase();
+  if (key === 's') byId('btn-random').click();
+  else if (key === 'd') loadDemoPhotos();
+  else if (key >= '1' && key <= '6') {
+    const at = Number(key) - 1;
+    if (at < (LAYOUTS[state.layout] || []).length) {
+      state.selected = at;
+      syncFrameSliders();
+      paint();
+    }
+  } else if (key === 'arrowright' || key === 'arrowleft') {
+    const count = (LAYOUTS[state.layout] || []).length;
+    if (count > 0) {
+      const step = key === 'arrowright' ? 1 : -1;
+      state.selected = (state.selected + step + count) % count;
+      syncFrameSliders();
+      paint();
+    }
+  }
+});
+
 // ---------------------------------------------------------------- export --
 
-byId('btn-export').addEventListener('click', () => {
+function exportCover() {
   const [w, h] = state.size.split('x').map(Number);
   const out = document.createElement('canvas');
   out.width = w;
@@ -257,7 +298,9 @@ byId('btn-export').addEventListener('click', () => {
     setTimeout(() => URL.revokeObjectURL(link.href), 4000);
     byId('export-note').textContent = `Exported vice-frame-${state.size}.png — check your downloads.`;
   }, 'image/png');
-});
+}
+
+byId('btn-export').addEventListener('click', exportCover);
 
 // --------------------------------------------------------------- startup --
 // URL parameters:
@@ -289,6 +332,13 @@ async function start() {
   if (q.get('size') && SIZES.includes(q.get('size'))) {
     state.size = q.get('size');
     markPill('size-seg', 'size', state.size);
+  }
+  if (q.get('leak') !== null) {
+    const leak = Number(q.get('leak'));
+    if (Number.isFinite(leak)) {
+      state.lightLeak = Math.min(1, Math.max(0, leak));
+      byId('light-leak').value = state.lightLeak;
+    }
   }
 
   ensureFrames();
